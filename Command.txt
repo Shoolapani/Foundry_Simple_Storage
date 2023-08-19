@@ -1,0 +1,206 @@
+----------------------------------------
+
+# Never ever add private key in .env file it is just a dummy account in Makefile
+
+if we don't want to write long command use Makefile
+
+----------------------------------------
+Below using forge command:
+
+forge create SimpleStorage --rpc-url http://172.27.96.1:7545 --interactive
+forge script script/DeploySimpleStorage.s.sol --rpc-url http://172.27.96.1:7545 --broadcast --private-key 0x9ccd11cdab1bd603fef9595b6d644a8715c84ba3d4931a3526d08752eb35da1b
+forge script script/DeploySimpleStorage.s.sol --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY
+
+forge script script/DeploySimpleStorage.s.sol --rpc-url $SEPOLIA_RPC_URL --private-key $SEPOLIA_PRIVATE_KEY --broadcast
+
+we have --broadcast so it will send the if not added it will just simulate it.
+
+using third web:
+npx thirdweb deploy
+
+when ever we are deploying in real world with real money we will use third web or similar or  --interactive one
+as .env as may be deployed on git so check the .gitIgnore file also.
+
+
+------------------------------------------
+cast send 0x4732Cc54E791338cD59904312687278021173E2c "store(uint256)" 1234 --rpc-url $RPC_URL --private-key $PRIVATE_KEY
+
+0x9Be3DB60506EdbAb14F355178c6E555507ea5b6a is CREATED CONTRACT ADDRESS
+
+send to some function which require parameter
+-------------------------------------------
+To view the function
+
+cast call 0x4732Cc54E791338cD59904312687278021173E2c "retrieve()" --rpc-url $RPC_URL
+
+--------------------------------------------
+hex to dec
+
+cast --to-base 0x00000000000000000000000000000000000000000000000000000000000004d2 dec
+
+--------------------------------------------
+
+during UT build first function setUp() is called
+
+To run the test 
+
+forge test
+
+to print logs also
+
+forge test -vv
+
+Fork Test:
+forge test -vvv --fork-url $SEPOLIA_RPC_URL
+
+To run a specific UT:
+forge test -vvv --match-test testGetVersion --fork-url $SEPOLIA_RPC_URL
+
+Coverage:
+forge coverage --fork-url $SEPOLIA_RPC_URL
+
+This will also work above is fork test
+forge coverage 
+
+--------------------------------------------
+chisel
+to take test some lines of code & it compile line by line one line at a time
+
+--------------------------------------------
+To see  storage layout:
+
+forge inspect FundMe storageLayout
+
+
+{
+  "storage": [
+    {
+      "astId": 43149,
+      "contract": "src/FundMe.sol:FundMe",
+      "label": "s_funders",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_array(t_address)dyn_storage"
+    },
+    {
+      "astId": 43153,
+      "contract": "src/FundMe.sol:FundMe",
+      "label": "s_addressToAmountFunded",
+      "offset": 0,
+      "slot": "1",
+      "type": "t_mapping(t_address,t_uint256)"
+    },
+    {
+      "astId": 43156,
+      "contract": "src/FundMe.sol:FundMe",
+      "label": "s_priceFeed",
+      "offset": 0,
+      "slot": "2",
+      "type": "t_contract(AggregatorV3Interface)45"
+    }
+  ],
+  "types": {
+    "t_address": {
+      "encoding": "inplace",
+      "label": "address",
+      "numberOfBytes": "20"
+    },
+    "t_array(t_address)dyn_storage": {
+      "encoding": "dynamic_array",
+      "label": "address[]",
+      "numberOfBytes": "32",
+      "base": "t_address"
+    },
+    "t_contract(AggregatorV3Interface)45": {
+      "encoding": "inplace",
+      "label": "contract AggregatorV3Interface",
+      "numberOfBytes": "20"
+    },
+    "t_mapping(t_address,t_uint256)": {
+      "encoding": "mapping",
+      "key": "t_address",
+      "label": "mapping(address => uint256)",
+      "numberOfBytes": "32",
+      "value": "t_uint256"
+    },
+    "t_uint256": {
+      "encoding": "inplace",
+      "label": "uint256",
+      "numberOfBytes": "32"
+    }
+  }
+}
+
+--------------------------------------------
+
+Reading & writing can be on storage is cost lot of Gas 
+
+constant & immutatable variable takes less amt of Gas
+
+to see the gas cost copy the opcodes
+
+"opcodes": "PUSH1 0x80 PUSH1 0x40 MSTORE CALLVALUE DUP1 ISZERO PUSH2 0x10 JUMPI PUSH1 0x0" 
+
+from bytecode
+
+see the gas price from evm.code
+
+--------------------------------------------
+TO see gas amt:
+forge snapshot
+
+--------------------------------------------
+naming convention:
+1. storage variable: s_name;
+2. immutatable variable: i_name;
+3. constant variable: NAME;
+
+--------------------------------------------
+To  Verify our contract automati:
+forge script script/DeployFundMe.s.sol:DeployFundMe --rpc-url $(SEPOLIA_RPC_URL) --private-key $(SEPOLIA_PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
+
+--verify keyword is here used
+
+Submitted contract for verification:
+        Response: `OK`
+        GUID: `hcjii82rck1cuddf4xu6iukcdgqeay52gcdbbaev5sjcwf64jq`
+        URL:
+        https://sepolia.etherscan.io/address/0x8243a30d4e51e1c6a9db0c2f2aca3a1ccb7e9879
+Contract verification status:
+Response: `NOTOK`
+Details: `Pending in queue`
+Contract verification status:
+Response: `OK`
+Details: `Pass - Verified`
+
+**Contract successfully verified**
+
+All (1) contracts were verified!
+
+Transactions saved to: /root/solidity_fun/Foundry-F23/foundry-fund-me-f23/broadcast/DeployFundMe.s.sol/11155111/run-latest.json
+
+Sensitive values saved to: /root/solidity_fun/Foundry-F23/foundry-fund-me-f23/cache/DeployFundMe.s.sol/11155111/run-latest.json
+
+--------------------------------------------
+To add money in the account in the anvil add the private key Import account
+
+0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+--------------------------------------------
+IMP::Function selectors
+
+cast sig "fund()"
+0xb60d4288
+
+we can from the metamask that it is calling a correct function in Hex
+
+HEX DATA: 4 BYTES
+0xb60d4288
+
+--------------------------------------------
+
+
+--------------------------------------------
+
+
+--------------------------------------------
